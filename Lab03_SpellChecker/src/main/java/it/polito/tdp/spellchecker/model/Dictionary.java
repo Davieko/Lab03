@@ -56,8 +56,10 @@ public class Dictionary {
 		RichWord parola;
 		for(String s : inputTextList) {
 			for(String word : dizionario) {
-				if(word.equals(s))
+				if(word.equalsIgnoreCase(s)) {
 					parola = new RichWord(s, true);
+					break;
+				}
 				else
 					parola = new RichWord(s, false);
 				words.add(parola);
@@ -69,23 +71,27 @@ public class Dictionary {
 	public List<RichWord> spellCheckTextDichotomic(List<String> inputTextList) {
 		List<RichWord> words = new ArrayList<>();
 		RichWord parola;
-		int start, end;
-		String half = dizionario.get(dizionario.size()/2);
+		
+		
 		for(String s: inputTextList) {
-			if(s.compareTo(half) < 0) {
-				start = 0;
-				end = dizionario.size()/2;
+			int start = 0, end = dizionario.size();
+			boolean found = false;
+			//vedo a quale metà appartiene -> salvo gli estremi -> ripeto con estremi nuovi ed esco fino a quando start = end
+			while(end != start && !found) {
+				int half = start + (end - start)/2;
+				if(s.compareTo(dizionario.get(half)) == 0) {
+					found = true;
+				} else if(s.compareTo(dizionario.get(half)) < 0) {
+					end = half;
+				} else
+					start = half + 1;
+			}
+			if(found) {
+				parola = new RichWord(s, true);
 			} else {
-				start = dizionario.size()/2;
-				end = dizionario.size();
+				parola = new RichWord(s, false);
 			}
-			for(int i = start; i < end; i++) {
-				if(s.equals(dizionario.get(i)))
-					parola = new RichWord(s, true);
-				else
-					parola = new RichWord(s, false);
-				words.add(parola);
-			}
+			words.add(parola);
 		}
 		
 		return words;
